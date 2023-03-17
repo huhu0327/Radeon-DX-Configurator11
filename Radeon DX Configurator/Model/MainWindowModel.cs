@@ -5,14 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using System.Windows.Navigation;
 
 namespace Radeon_DX_Configurator.Model
 {
     public class MainWindowModel : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        public ObservableCollection<string> currentValue;
+        private ObservableCollection<string> currentValue;
         public ObservableCollection<string> CurrentValue
         {
             get { return currentValue; }
@@ -23,7 +24,7 @@ namespace Radeon_DX_Configurator.Model
             }
         }
             
-        public ObservableCollection<string> currentWOWValue;
+        private ObservableCollection<string> currentWOWValue;
         public ObservableCollection<string> CurrentWOWValue
         {
             get { return currentWOWValue; }
@@ -36,11 +37,7 @@ namespace Radeon_DX_Configurator.Model
 
         protected void OnPropertyChanged(string name)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(name));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
     }

@@ -13,44 +13,37 @@
         <viewModel:MainWindowViewModel/>
     </Window.DataContext>
 
-    <Grid Width="800" Height="350">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="241*"/>
-            <ColumnDefinition Width="265*"/>
-            <ColumnDefinition Width="94*"/>
-        </Grid.ColumnDefinitions>
-
-        <Label Content="D3DVendorName" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.512,0.57"/>
-        <ListBox d:ItemsSource="{d:SampleData ItemCount=4}" ItemsSource="{Binding Model.CurrentValue}" Margin="10,26,10,0" VerticalAlignment="Top" Height="93" Grid.ColumnSpan="3">
-
-
+    <StackPanel Width="800" Height="500" Orientation="Vertical">
+        <Label Content="D3DVendorName" Margin="10,5,0,0"/>
+        <ListBox d:ItemsSource="{d:SampleData ItemCount=4}" ItemsSource="{Binding Model.CurrentValue, UpdateSourceTrigger=PropertyChanged}" Margin="10,5,10,0" >
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding Path=.}" />
                     </StackPanel>
-
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <Button Content="Set Regular DX9" Command="{Binding RegularDX9Button}" Margin="10,0,0,80" VerticalAlignment="Bottom" Height="30" HorizontalAlignment="Left" Width="385" Grid.ColumnSpan="2"/>
-        <Button Content="Set Regular DX11" Command="{Binding RegularDX11Button}" Margin="0,0,10,80" VerticalAlignment="Bottom" Height="30" HorizontalAlignment="Right" Width="385" Grid.Column="1" Grid.ColumnSpan="2"/>
-        <Button Content="Set DXNAVI (DX9)" Command="{Binding DXNAVI_DX9Button}" Margin="10,0,0,45" VerticalAlignment="Bottom" Height="30" HorizontalAlignment="Left" Width="385" Grid.ColumnSpan="2"/>
-        <Button Content="Set DXNAVI (DX11)" Command="{Binding DXNAVI_DX11Button}" Margin="0,0,10,45" VerticalAlignment="Bottom" Height="30" HorizontalAlignment="Right" Width="385" Grid.Column="1" Grid.ColumnSpan="2"/>
-        <Button Content="Restore to backup" Command="{Binding RestoreBackupButton}" Margin="10,0,10,10" VerticalAlignment="Bottom" Height="30" Grid.ColumnSpan="3"/>
-        <Label Content="D3DVendorNameWOW" HorizontalAlignment="Left" Margin="10,119,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.512,0.57"/>
-        <ListBox d:ItemsSource="{d:SampleData ItemCount=4}" ItemsSource="{Binding Model.CurrentWOWValue}" Margin="10,143,10,0" VerticalAlignment="Top" Height="92" Grid.ColumnSpan="3">
-
-
+        
+        <Label Content="D3DVendorNameWOW" Margin="10,5,0,0"/>
+        <ListBox d:ItemsSource="{d:SampleData ItemCount=4}" ItemsSource="{Binding Model.CurrentWOWValue, UpdateSourceTrigger=PropertyChanged}" Margin="10,5,10,0">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding .}" />
                     </StackPanel>
-
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
 
-    </Grid>
+        <WrapPanel HorizontalAlignment="Center" Width="800" Margin="0, 10">
+            <Button Content="Set Regular DX9" Command="{Binding RegularDX9Button}"  Width="390" Height="50" Margin="5" />
+            <Button Content="Set Regular DX11 (권장)" Command="{Binding RegularDX11Button}" Width="390" Height="50" Margin="5" />
+            <Button Content="Set DXNAVI DX9" Command="{Binding DXNAVI_DX9Button}" Width="390" Height="50" Margin="5" />
+            <Button Content="Set DXNAVI DX11" Command="{Binding DXNAVI_DX11Button}" Width="390" Height="50" Margin="5" />
+        </WrapPanel>
+        
+        <Button Content="Apply" Background="Green" Foreground="White" Command="{Binding ApplyButton}" Margin="10,0,10,10" Height="40"/>
+        <Button Content="Restore to backup" Command="{Binding RestoreBackupButton}" Margin="10,0,10,10" Height="40"/>
+    </StackPanel>
 </Window>

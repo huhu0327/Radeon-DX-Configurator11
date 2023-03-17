@@ -1,3 +1,10 @@
+# Radeon-DX-Configurator11
+
+This repo forked  https://github.com/cbk0313/Radeon-DX-Configurator 
+
+support Windows 11
+
+---
 # Radeon-DX-Configurator
 
 
@@ -10,4 +17,3 @@ I only recommend "Set Regular DX11" because problems occur mainly in DXNAVI (DX1
 
 
 ![radeon](https://user-images.githubusercontent.com/66576971/216783646-0f266141-059c-4481-b5f3-c5485795755a.png)
-
