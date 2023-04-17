@@ -5,7 +5,6 @@ using Radeon_DX_Configurator.ViewModel.Command;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -15,7 +14,7 @@ namespace Radeon_DX_Configurator.ViewModel
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        private MainWindowModel model = new();
+        private MainWindowModel model;
         public MainWindowModel Model
         {
             get { return model; }
@@ -77,6 +76,11 @@ namespace Radeon_DX_Configurator.ViewModel
         {
             var osVersion = Environment.OSVersion.Version.Build < 2200 ? 0 : 1;
             SubkeyName = $@"SYSTEM\CurrentControlSet\Control\Class\{{4d36e968-e325-11ce-bfc1-08002be10318}}\{string.Format("{0:X4}", osVersion)}";
+            Model = new()
+            {
+                CurrentValue = new ObservableCollection<string>(),
+                CurrentWOWValue = new ObservableCollection<string>()
+            };
 
             ReadRegist();
             ReadWowRegist();
@@ -100,7 +104,15 @@ namespace Radeon_DX_Configurator.ViewModel
                 return;
             }
 
-            Model.CurrentValue = new ObservableCollection<string>(vender);
+            if (Model.CurrentValue.Count > 0)
+            {
+                Model.CurrentValue.Clear();
+            }
+
+            foreach (var value in vender)
+            {
+                Model.CurrentValue.Add(value);
+            }
         }
 
         private void ReadWowRegist()
@@ -112,7 +124,15 @@ namespace Radeon_DX_Configurator.ViewModel
                 return;
             }
 
-            Model.CurrentWOWValue = new ObservableCollection<string>(vender);
+            if (Model.CurrentWOWValue.Count > 0)
+            {
+                Model.CurrentWOWValue.Clear();
+            }
+
+            foreach (var value in vender)
+            {
+                Model.CurrentWOWValue.Add(value);
+            }
         }
 
         private void LoadBackup()
@@ -125,34 +145,27 @@ namespace Radeon_DX_Configurator.ViewModel
                 result = MessageBox.Show("There is no backup file. Create a backup file?", "backup", MessageBoxButton.YesNo);
                 if (result != MessageBoxResult.Yes) return;
 
-                for (int i = 0; i < 4; i++)
-                {
-                    string num = i.ToString();
-                    ini[Vender64Name][num] = Model.CurrentValue[i];
-                    ini[Vender32Name][num] = Model.CurrentWOWValue[i];
-                }
-                ini.Save(BackupFile);
-
+                SaveIniFile(ini);
                 return;
             }
 
-            string backupPath = Path.GetDirectoryName(ini[Vender64Name]["0"].GetString());
-            string curPath = Path.GetDirectoryName(Model.CurrentValue[0]);
-            if (backupPath == curPath) return;
+            if (EqualIniAndCurrentValue(ini)) return;
 
             result = MessageBox.Show("The backup recovery function does not work because the current path of the .dll does not match the backup file. Would you like to create a new backup file?", "backup", MessageBoxButton.YesNo);
             if (result != MessageBoxResult.Yes) return;
 
-            for (int i = 0; i < 4; i++)
-            {
-                string num = i.ToString();
-                ini[Vender64Name][num] = Model.CurrentValue[i];
-                ini[Vender32Name][num] = Model.CurrentWOWValue[i];
-            }
-
-            ini.Save(BackupFile);
+            SaveIniFile(ini);
         }
 
+        private void SaveIniFile(IniFile ini)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                ini[Vender64Name][i.ToString()] = Model.CurrentValue[i];
+                ini[Vender32Name][i.ToString()] = Model.CurrentWOWValue[i];
+            }
+            ini.Save(BackupFile);
+        }
 
         private void ApplyButtonClick()
         {
@@ -167,9 +180,7 @@ namespace Radeon_DX_Configurator.ViewModel
             var ini = new IniFile();
             if (!ini.Load(BackupFile)) return;
 
-            string backupPath = Path.GetDirectoryName(ini[Vender64Name]["0"].GetString());
-            string curPath = Path.GetDirectoryName(Model.CurrentValue[0]);
-            if (backupPath != curPath)
+            if (!EqualIniAndCurrentValue(ini))
             {
                 MessageBox.Show("Recovery failed because the current path of the .dll does not match the backup file");
                 return;
@@ -183,8 +194,16 @@ namespace Radeon_DX_Configurator.ViewModel
                     return;
                 }
 
-                powerKey.SetValue(Vender64Name, new string[] { ini[Vender64Name]["0"].GetString(), ini[Vender64Name]["1"].GetString(), ini[Vender64Name]["2"].GetString(), ini[Vender64Name]["3"].GetString() });
-                powerKey.SetValue(Vender32Name, new string[] { ini[Vender32Name]["0"].GetString(), ini[Vender32Name]["1"].GetString(), ini[Vender32Name]["2"].GetString(), ini[Vender32Name]["3"].GetString() });
+                var vender32 = ini[Vender32Name].Values
+                    .Select(x => x.Value.ToString())
+                    .ToArray();
+                var vender64 = ini[Vender64Name].Values
+                    .Select(x => x.Value.ToString())
+                    .ToArray();
+
+                powerKey.SetValue(Vender32Name, vender32);
+                powerKey.SetValue(Vender64Name, vender64);
+
                 MessageBox.Show("Recovery success.");
             }
 
@@ -192,13 +211,33 @@ namespace Radeon_DX_Configurator.ViewModel
             ReadWowRegist();
         }
 
+        private bool EqualIniAndCurrentValue(IniFile ini)
+        {
+            var backup32Path = ini[Vender32Name].Values
+                .Select(x => Path.GetDirectoryName(x.Value.ToString()))
+                .ToArray();
+            var cur32Path = Model.CurrentWOWValue
+                .Select(x => Path.GetDirectoryName(x))
+                .ToArray();
+
+            var backup64Path = ini[Vender64Name].Values
+                .Select(x => Path.GetDirectoryName(x.Value.ToString()))
+                .ToArray();
+            var cur64Path = Model.CurrentValue
+                .Select(x => Path.GetDirectoryName(x))
+                .ToArray();
+
+            return backup32Path.SequenceEqual(cur32Path) && backup64Path.SequenceEqual(cur64Path);
+        }
+
         private void SetupRegist()
         {
             using var powerKey = Parentkey.OpenSubKey(SubkeyName, true);
             if (powerKey is null) return;
 
-            var veder32 = new string[] { Model.CurrentWOWValue[0], Model.CurrentWOWValue[1], Model.CurrentWOWValue[2], Model.CurrentWOWValue[3] };
-            var veder64 = new string[] { Model.CurrentValue[0], Model.CurrentValue[1], Model.CurrentValue[2], Model.CurrentValue[3] };
+            var veder32 = Model.CurrentWOWValue.ToArray();
+            var veder64 = Model.CurrentValue.ToArray();
+
             powerKey.SetValue(Vender32Name, veder32);
             powerKey.SetValue(Vender64Name, veder64);
         }
