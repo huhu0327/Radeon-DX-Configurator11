@@ -1,8 +1,12 @@
 # Radeon-DX-Configurator11
 
-This repo forked  https://github.com/cbk0313/Radeon-DX-Configurator 
+이 레포지토리는 https://github.com/cbk0313/Radeon-DX-Configurator 에서 포크하였습니다.
 
-support Windows 11
+윈도우11 추가지원
+```
+!주의!
+[Set Regular DX11] 를 사용할 경우 일부 프로그램 작동에 오류가 있음을 알립니다.(ex: wallpaper engine)
+```
 
 ---
 # Radeon-DX-Configurator
