@@ -247,10 +247,16 @@ namespace Radeon_DX_Configurator.ViewModel
             foreach (var item in idxs)
             {
                 var path_32 = Path.GetDirectoryName(Model.CurrentWOWValue[item]);
-                var path_64 = Path.GetDirectoryName(Model.CurrentValue[item]);
+                if (!string.IsNullOrEmpty(path_32))
+                {
+                    Model.CurrentWOWValue[item] = Path.Combine(path_32, list32[item]);
+                }
 
-                Model.CurrentWOWValue[item] = Path.Combine(path_32, list32[item]);
-                Model.CurrentValue[item] = Path.Combine(path_64, list64[item]);
+                var path_64 = Path.GetDirectoryName(Model.CurrentValue[item]);
+                if (!string.IsNullOrEmpty(path_64))
+                {
+                    Model.CurrentValue[item] = Path.Combine(path_64, list64[item]);
+                }
             }
         }
 
