@@ -2,7 +2,9 @@
 
 이 레포지토리는 https://github.com/cbk0313/Radeon-DX-Configurator 에서 포크하였습니다.
 
-윈도우11 추가지원
+라데온 유저를 위한 일부 프로그램 프리징 문제를 해결하기위한 레지스트리 툴입니다.
+윈도우11에서의 실행 오류를 해결한 버전입니다.
+
 ```
 !주의!
 [Set Regular DX11] 를 사용할 경우 일부 프로그램 작동에 오류가 있음을 알립니다.(ex: wallpaper engine)
